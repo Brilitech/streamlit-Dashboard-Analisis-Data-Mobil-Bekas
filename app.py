@@ -132,10 +132,10 @@ year_min = int(df['model_year'].min())
 year_max = int(df['model_year'].max())
 selected_year = st.sidebar.slider("Tahun", year_min, year_max, (year_min, year_max))
 
-# Filter harga
+# Filter harga (dalam Dollar)
 price_min = int(df['price'].min())
 price_max = int(df['price'].max())
-selected_price = st.sidebar.slider("Harga (Rp)", price_min, price_max, (price_min, price_max))
+selected_price = st.sidebar.slider("Harga ($)", price_min, price_max, (price_min, price_max))
 
 # Filter kondisi
 condition_choices = ['Semua'] + sorted(df['condition'].dropna().unique().tolist())
@@ -170,7 +170,7 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric("📊 Total Data", f"{len(filtered_df):,}")
 with col2:
-    st.metric("💰 Harga Rata-rata", f"Rp {filtered_df['price'].mean():,.0f}")
+    st.metric("💰 Harga Rata-rata", f"$ {filtered_df['price'].mean():,.0f}")
 with col3:
     st.metric("📅 Tahun Rata-rata", f"{filtered_df['model_year'].mean():.0f}")
 with col4:
@@ -182,12 +182,12 @@ st.divider()
 col_chart1, col_chart2 = st.columns(2)
 with col_chart1:
     st.subheader("📊 Distribusi Harga")
-    fig1 = px.histogram(filtered_df, x="price", nbins=30, title="Distribusi Harga")
+    fig1 = px.histogram(filtered_df, x="price", nbins=30, title="Distribusi Harga ($)")
     st.plotly_chart(fig1, use_container_width=True)
 
 with col_chart2:
     st.subheader("📈 Harga vs Tahun")
-    fig2 = px.scatter(filtered_df, x="model_year", y="price", title="Harga vs Tahun", opacity=0.6)
+    fig2 = px.scatter(filtered_df, x="model_year", y="price", title="Harga ($) vs Tahun", opacity=0.6)
     st.plotly_chart(fig2, use_container_width=True)
 
 st.subheader("📋 Data Mobil Bekas (Hasil Filter)")
@@ -211,7 +211,7 @@ else:
         col_in1, col_in2 = st.columns(2)
         
         with col_in1:
-            input_price = st.number_input("💰 Harga Mobil (Rp)", min_value=0, value=10000000, step=1000000)
+            input_price = st.number_input("💰 Harga Mobil ($)", min_value=0, value=10000, step=1000)
             input_year = st.number_input("📅 Tahun Pembuatan", min_value=1990, max_value=2025, value=2015)
             input_odometer = st.number_input("📏 Odometer (km)", min_value=0, value=80000, step=1000)
             input_cylinders = st.selectbox("🔧 Jumlah Silinder", options=sorted(df['cylinders'].dropna().unique()), index=0)
@@ -249,22 +249,22 @@ else:
             if input_price <= predicted_price * threshold:
                 status = "✅ LAYAK"
                 color = "green"
-                detail = f"Harga yang Anda masukkan **{input_price:,.0f}** lebih rendah dari harga pasar prediksi **{predicted_price:,.0f}** (diskon > {100 - threshold*100:.0f}%). Mobil ini tergolong murah."
+                detail = f"Harga yang Anda masukkan **$ {input_price:,.0f}** lebih rendah dari harga pasar prediksi **$ {predicted_price:,.0f}** (diskon > {100 - threshold*100:.0f}%). Mobil ini tergolong murah."
             elif input_price <= predicted_price:
                 status = "⚠️ CUKUP LAYAK"
                 color = "orange"
-                detail = f"Harga Anda **{input_price:,.0f}** masih di bawah prediksi pasar **{predicted_price:,.0f}**, tapi tidak terlalu jauh. Masih tergolong wajar."
+                detail = f"Harga Anda **$ {input_price:,.0f}** masih di bawah prediksi pasar **$ {predicted_price:,.0f}**, tapi tidak terlalu jauh. Masih tergolong wajar."
             else:
                 status = "❌ TIDAK LAYAK"
                 color = "red"
-                detail = f"Harga yang Anda masukkan **{input_price:,.0f}** lebih tinggi dari prediksi pasar **{predicted_price:,.0f}**. Mobil ini tergolong mahal."
+                detail = f"Harga yang Anda masukkan **$ {input_price:,.0f}** lebih tinggi dari prediksi pasar **$ {predicted_price:,.0f}**. Mobil ini tergolong mahal."
             
             st.subheader("📊 Hasil Prediksi")
             col_res1, col_res2, col_res3 = st.columns(3)
             with col_res1:
-                st.metric("Harga Input", f"Rp {input_price:,.0f}")
+                st.metric("Harga Input", f"$ {input_price:,.0f}")
             with col_res2:
-                st.metric("Harga Prediksi", f"Rp {predicted_price:,.0f}", delta=f"{predicted_price - input_price:,.0f}")
+                st.metric("Harga Prediksi", f"$ {predicted_price:,.0f}", delta=f"$ {predicted_price - input_price:,.0f}")
             with col_res3:
                 st.metric("Status Kelayakan", status, delta_color="off")
             
@@ -272,7 +272,7 @@ else:
             
             if mae is not None and r2 is not None:
                 with st.expander("ℹ️ Performa Model"):
-                    st.write(f"**Mean Absolute Error (MAE):** Rp {mae:,.0f}")
+                    st.write(f"**Mean Absolute Error (MAE):** $ {mae:,.0f}")
                     st.write(f"**R² Score:** {r2:.3f}")
                     st.write("MAE adalah rata-rata selisih absolut antara harga prediksi dan aktual. R² menunjukkan seberapa baik model menjelaskan variasi harga.")
         except Exception as e:
